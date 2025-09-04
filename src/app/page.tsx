@@ -85,6 +85,7 @@ export default function Home() {
   const [currentBeer, setCurrentBeer] = useState(data[currentIndex]);
   const [scores, setScores] = useState([0, 0, 0, 0, 0]);
   const [currentScore, setCurrentScore] = useState(scores[currentIndex]);
+  const [showNextError, setShowNextError] = useState(false);
 
   const submit = () => {
     if (name.trim() === "") {
@@ -199,12 +200,35 @@ export default function Home() {
                 </div>
               )
               : (
-                <div className="flex gap-2">
-                  {currentIndex > 0 && (
+                <>
+                  <div className="flex gap-2">
+                    {currentIndex > 0 && (
+                      <button
+                        onClick={() => {
+                          setCurrentIndex((prev) => {
+                            const nextIndex = prev - 1;
+                            if (nextIndex >= data.length) {
+                              return 0;
+                            }
+                            return nextIndex;
+                          });
+                        }}
+                        className="bg-gray-500 text-white rounded-lg p-2 mt-4 hover:bg-gray-800 active:bg-gray-900"
+                      >
+                        Föregående öl!
+                      </button>
+                    )}
                     <button
                       onClick={() => {
+                        if (currentScore === 0) {
+                          setShowNextError(true);
+                          return;
+                        }
+
+                        setShowNextError(false);
+
                         setCurrentIndex((prev) => {
-                          const nextIndex = prev - 1;
+                          const nextIndex = prev + 1;
                           if (nextIndex >= data.length) {
                             return 0;
                           }
@@ -213,24 +237,15 @@ export default function Home() {
                       }}
                       className="bg-gray-500 text-white rounded-lg p-2 mt-4 hover:bg-gray-800 active:bg-gray-900"
                     >
-                      Föregående öl!
+                      Till nästa öl!
                     </button>
+                  </div>
+                  {showNextError && (
+                    <div className="text-red-500 mt-4">
+                      Vänligen sätt ett betyg för att gå vidare.
+                    </div>
                   )}
-                  <button
-                    onClick={() => {
-                      setCurrentIndex((prev) => {
-                        const nextIndex = prev + 1;
-                        if (nextIndex >= data.length) {
-                          return 0;
-                        }
-                        return nextIndex;
-                      });
-                    }}
-                    className="bg-gray-500 text-white rounded-lg p-2 mt-4 hover:bg-gray-800 active:bg-gray-900"
-                  >
-                    Till nästa öl!
-                  </button>
-                </div>
+                </>
               )}
           </div>
         )
