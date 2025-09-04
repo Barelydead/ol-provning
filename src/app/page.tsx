@@ -114,24 +114,12 @@ export default function Home() {
   const persistScores = async () => {
     const name = localStorage.getItem("name");
 
-    // fetch current scores
-    const res = await fetch("/api/scores");
-    const data = await res.json();
-    const currentScores = data.scores;
-
-    // add new entry
-    currentScores.push({ name, scores });
-
-    // post updated data
     await fetch("/api/scores", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, scores }),
     });
 
-    // redirect to /result
     window.location.href = "/result";
   };
 

@@ -76,18 +76,40 @@ const data = [
   },
 ];
 
-const scores = [
-  {
-    name: "Christofer",
-    scores: [5, 4, 3, 2, 1],
-  },
-  {
-    name: "Erika",
-    scores: [3, 4, 2, 5, 1],
-  },
-];
+type Score = {
+  name: string;
+  scores: number[];
+};
 
 export default function Home() {
+  const [scores, setScores] = useState<Score[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchScores = async () => {
+      try {
+        const res = await fetch("/api/scores");
+        const json = await res.json();
+
+        // Convert stored JSON string back to array if needed
+        const formatted: Score[] = json.scores.map((entry: any) => ({
+          name: entry.name,
+          scores: JSON.parse(entry.scores),
+        }));
+
+        setScores(formatted);
+      } catch (err) {
+        console.error("Failed to fetch scores:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchScores();
+  }, []);
+
+  if (loading) return <div className="p-6 text-center">Loading scores...</div>;
+
   return (
     <div>
       <nav className="p-4 flex justify-center gap-2">
@@ -103,8 +125,13 @@ export default function Home() {
             </h4>
 
             <span className="font-bold mb-4">
-              Genomsnitt: {scores.reduce((acc, curr) =>
-                acc + curr.scores[index], 0) / scores.length}
+              Genomsnitt: {scores.length > 0
+                ? (
+                  scores.reduce((acc, curr) =>
+                    acc + curr.scores[index], 0) /
+                  scores.length
+                ).toFixed(1)
+                : "N/A"}
             </span>
 
             {scores.map((score) => (
